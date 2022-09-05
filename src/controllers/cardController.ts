@@ -4,6 +4,8 @@ import {
   createCardService,
   activateCardService,
   balanceCardService,
+  blockCardService,
+  unblockCardService,
 } from '../services/cardService';
 
 export async function createCard(req: Request, res: Response) {
@@ -62,4 +64,19 @@ export async function balanceCard(req: Request, res: Response) {
   );
 
   res.status(200).send(balance);
+}
+
+export async function blockCard(req: Request, res: Response) {
+  const { password } = req.body;
+  const cardId = Number(req.params.cardId);
+  await blockCardService(cardId, password);
+  res.sendStatus(200);
+}
+
+export async function unblockCard(req: Request, res: Response) {
+  const { password } = req.body;
+  const cardId = Number(req.params.cardId);
+  await unblockCardService(cardId, password);
+  console.log('aqui8');
+  res.sendStatus(200);
 }

@@ -1,10 +1,10 @@
 import {
-  CardInsertData,
   findByCardDetails,
   findByTypeAndEmployeeId,
   insert,
   TransactionTypes,
   update,
+  findById as findCardById,
 } from '../repositories/cardRepository';
 import { findByApiKey } from '../repositories/companyRepository';
 import { findById } from '../repositories/employeeRepository';
@@ -198,4 +198,75 @@ export async function balanceCardService(
   };
 
   return balance;
+}
+
+function cardExistId(card: object) {
+  if (!card) {
+    throw {
+      code: 'NotFound',
+      message: 'O cartão informado não foi encontrado.',
+    };
+  }
+}
+
+function validatePassword(password: string, validPassword: string) {
+  const validatePassword = bcrypt.compareSync(password, validPassword);
+  if (!validatePassword) {
+    throw {
+      code: 'Unauthorized',
+      message: 'O cartão informado não foi encontrado.',
+    };
+  }
+}
+
+function cardIsBlocked(blocked: boolean) {
+  if (blocked) {
+    throw {
+      code: 'BadRequest',
+      message: 'O cartão informado ja esta bloqueado.',
+    };
+  }
+}
+
+function cardIsActive(password: string) {
+  if (password === null) {
+    throw { code: 'Conflict', message: 'O cartão informado não está ativado.' };
+  }
+}
+
+export async function blockCardService(cardId: number, password: string) {
+  const card = await findCardById(cardId);
+
+  cardExistId(card);
+  cardIsActive(card.password);
+  validatePassword(password, card.password);
+  cardIsBlocked(card.isBlocked);
+  cardValidationDate(card.expirationDate);
+
+  const cardUpdate = { isBlocked: true };
+
+  return await update(cardId, cardUpdate);
+}
+
+function cardIsUnblocked(blocked: boolean) {
+  if (!blocked) {
+    throw {
+      code: 'BadRequest',
+      message: 'O cartão informado ja esta desbloqueado.',
+    };
+  }
+}
+
+export async function unblockCardService(cardId: number, password: string) {
+  const card = await findCardById(cardId);
+
+  cardExistId(card);
+  cardIsActive(card.password);
+  validatePassword(password, card.password);
+  cardIsUnblocked(card.isBlocked);
+  cardValidationDate(card.expirationDate);
+
+  const cardUpdate = { isBlocked: false };
+
+  return await update(cardId, cardUpdate);
 }
