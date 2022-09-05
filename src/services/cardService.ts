@@ -12,7 +12,10 @@ import {
   findByCardId as findRecharges,
   insert as insertRecharge,
 } from '../repositories/rechargeRepository';
-import { findByCardId as findPayments } from '../repositories/paymentRepository';
+import {
+  findByCardId as findPayments,
+  insert as insertPayment,
+} from '../repositories/paymentRepository';
 import { faker } from '@faker-js/faker';
 import dayjs from 'dayjs';
 import dotenv from 'dotenv';
@@ -284,4 +287,32 @@ export async function rechargeService(cardId: number, amount: number) {
   const rechargeData = { cardId, amount };
 
   await insertRecharge(rechargeData);
+}
+
+function cardIsBlockedPayment(isBlocked: boolean) {
+  if (isBlocked) {
+    throw {
+      code: 'BadRequest',
+      message: 'O cartão informado está bloqueado.',
+    };
+  }
+}
+
+export async function paymentService(
+  password: string,
+  cardId: number,
+  businessId: number,
+  amount: number
+) {
+  const card = await findCardById(cardId);
+
+  cardExistId(card);
+  cardIsActive(card.password);
+  cardValidationDate(card.expirationDate);
+  cardIsBlockedPayment(card.isBlocked);
+  validatePassword(password, card.password);
+
+  const payment = { cardId, businessId, amount };
+
+  await insertPayment(payment);
 }

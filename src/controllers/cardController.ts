@@ -7,6 +7,7 @@ import {
   blockCardService,
   unblockCardService,
   rechargeService,
+  paymentService,
 } from '../services/cardService';
 
 export async function createCard(req: Request, res: Response) {
@@ -87,6 +88,20 @@ export async function recharge(req: Request, res: Response) {
   const { amount }: { amount: number } = req.body;
 
   await rechargeService(cardId, amount);
+
+  res.sendStatus(200);
+}
+
+export async function payment(req: Request, res: Response) {
+  const {
+    password,
+    cardId,
+    businessId,
+    amount,
+  }: { password: string; cardId: number; businessId: number; amount: number } =
+    req.body;
+
+  await paymentService(password, cardId, businessId, amount);
 
   res.sendStatus(200);
 }
