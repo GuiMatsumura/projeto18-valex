@@ -8,7 +8,10 @@ import {
 } from '../repositories/cardRepository';
 import { findByApiKey } from '../repositories/companyRepository';
 import { findById } from '../repositories/employeeRepository';
-import { findByCardId as findRecharges } from '../repositories/rechargeRepository';
+import {
+  findByCardId as findRecharges,
+  insert as insertRecharge,
+} from '../repositories/rechargeRepository';
 import { findByCardId as findPayments } from '../repositories/paymentRepository';
 import { faker } from '@faker-js/faker';
 import dayjs from 'dayjs';
@@ -269,4 +272,16 @@ export async function unblockCardService(cardId: number, password: string) {
   const cardUpdate = { isBlocked: false };
 
   return await update(cardId, cardUpdate);
+}
+
+export async function rechargeService(cardId: number, amount: number) {
+  const card = await findCardById(cardId);
+
+  cardExistId(card);
+  cardIsActive(card.password);
+  cardValidationDate(card.expirationDate);
+
+  const rechargeData = { cardId, amount };
+
+  await insertRecharge(rechargeData);
 }

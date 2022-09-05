@@ -6,6 +6,7 @@ import {
   balanceCard,
   blockCard,
   unblockCard,
+  recharge,
 } from '../controllers/cardController';
 import { schemaValidation } from '../middlewares/schemaValidation';
 import { createCartSchema } from '../schemas/cardSchema/createCardSchema';
@@ -13,6 +14,7 @@ import { ativateCardSchema } from '../schemas/cardSchema/ativateCardSchema';
 import { balanceCardSchema } from '../schemas/cardSchema/balanceCardSchema';
 import { blockCardSchema } from '../schemas/cardSchema/blockCardSchema';
 import { unblockCardSchema } from '../schemas/cardSchema/unblocCardSchema';
+import { rechargeSchema } from '../schemas/balanceSchema/rechargeSchema';
 
 const router = Router();
 
@@ -29,5 +31,6 @@ router.put(
   schemaValidation(unblockCardSchema),
   unblockCard
 );
+router.post('/recharge/:cardId', schemaValidation(rechargeSchema), recharge);
 
 export default router;

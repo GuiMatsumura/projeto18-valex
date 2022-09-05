@@ -6,6 +6,7 @@ import {
   balanceCardService,
   blockCardService,
   unblockCardService,
+  rechargeService,
 } from '../services/cardService';
 
 export async function createCard(req: Request, res: Response) {
@@ -67,16 +68,25 @@ export async function balanceCard(req: Request, res: Response) {
 }
 
 export async function blockCard(req: Request, res: Response) {
-  const { password } = req.body;
-  const cardId = Number(req.params.cardId);
+  const { password }: { password: string } = req.body;
+  const cardId: number = Number(req.params.cardId);
   await blockCardService(cardId, password);
   res.sendStatus(200);
 }
 
 export async function unblockCard(req: Request, res: Response) {
-  const { password } = req.body;
-  const cardId = Number(req.params.cardId);
+  const { password }: { password: string } = req.body;
+  const cardId: number = Number(req.params.cardId);
   await unblockCardService(cardId, password);
   console.log('aqui8');
+  res.sendStatus(200);
+}
+
+export async function recharge(req: Request, res: Response) {
+  const cardId: number = Number(req.params.cardId);
+  const { amount }: { amount: number } = req.body;
+
+  await rechargeService(cardId, amount);
+
   res.sendStatus(200);
 }
